@@ -18,7 +18,11 @@ class TAG_API ATagController : public AAIController
 public:
 	void BeginPlay() override;
 
+	void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
+
 private:
+	FTimerHandle TimerHandle;
+
 	UPROPERTY()
 		TArray<AActor*> Waypoints;
 

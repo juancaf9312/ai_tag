@@ -12,6 +12,13 @@ void ATagController::BeginPlay()
 	GoToRandomWaypoint();
 }
 
+void ATagController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult & Result)
+{
+	Super::OnMoveCompleted(RequestID, Result);
+
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &ATagController::GoToRandomWaypoint, 1.0f, false);
+}
+
 ATargetPoint* ATagController::GetRandomWaypoint()
 {
 	auto index = FMath::RandRange(0, Waypoints.Num() - 1);
