@@ -2,6 +2,8 @@
 
 #include "TagController.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "Runtime/Engine/Classes/GameFramework/Character.h"
+#include "Runtime/Engine/Classes/GameFramework/CharacterMovementComponent.h"
 
 void ATagController::BeginPlay()
 {
@@ -10,6 +12,14 @@ void ATagController::BeginPlay()
 	UGameplayStatics::GetAllActorsOfClass(this, ATargetPoint::StaticClass(), Waypoints);
 
 	GoToRandomWaypoint();
+
+	auto Character = GetCharacter();
+
+	if (Character)
+	{
+		Character->LandedDelegate.AddUniqueDynamic(this, &ATagController::OnLanded);
+		Character->MovementModeChangedDelegate.AddUniqueDynamic(this, &ATagController::OnMovementModeChanged);
+	}
 }
 
 void ATagController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult & Result)
@@ -28,4 +38,18 @@ ATargetPoint* ATagController::GetRandomWaypoint()
 void ATagController::GoToRandomWaypoint()
 {
 	MoveToActor(GetRandomWaypoint());
+}
+
+void ATagController::OnMovementModeChanged(ACharacter* MovedCharacter, EMovementMode PrevMovementMode, uint8 PreviousCustomMode /*= 0*/)
+{
+	// If the new movement mode is Falling
+	if (MovedCharacter->GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Falling)
+	{
+		GetPathFollowingComponent()->Deactivate();
+	}
+}
+
+void ATagController::OnLanded(const FHitResult & Hit)
+{
+	GetPathFollowingComponent()->Activate();
 }

@@ -31,4 +31,10 @@ private:
 
 	UFUNCTION(BlueprintCallable)
 		void GoToRandomWaypoint();
+
+	UFUNCTION()
+		void OnMovementModeChanged(ACharacter* MovedCharacter, EMovementMode PrevMovementMode, uint8 PreviousCustomMode = 0);
+
+	UFUNCTION()
+		void OnLanded(const FHitResult& Hit);
 };

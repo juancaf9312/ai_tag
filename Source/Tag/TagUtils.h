@@ -10,10 +10,12 @@
 
 #define print(x) if(GEngine){GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT(x));}
 #define printC(x, colour) if(GEngine){GEngine->AddOnScreenDebugMessage(-1, 2.0f, colour, TEXT(x));}
+#define printD(x, duration) if(GEngine){GEngine->AddOnScreenDebugMessage(-1, duration, FColor::Yellow, TEXT(x));}
 #define printCD(x, colour, duration) if(GEngine){GEngine->AddOnScreenDebugMessage(-1, duration, colour, TEXT(x));}
 
 #define printS(x) if(GEngine){GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, x);}
 #define printSC(x, colour) if(GEngine){GEngine->AddOnScreenDebugMessage(-1, 2.0f, colour, x);}
+#define printSD(x, duration) if(GEngine){GEngine->AddOnScreenDebugMessage(-1, duration, FColor::Yellow, x);}
 #define printSCD(x, colour, duration) if(GEngine){GEngine->AddOnScreenDebugMessage(-1, duration, colour, x);}
 
 #else
