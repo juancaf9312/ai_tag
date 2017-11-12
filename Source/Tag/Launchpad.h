@@ -34,7 +34,7 @@ public:
 		FVector Target;
 
 	UFUNCTION(BlueprintPure)
-		FVector CalculateLaunchVelocity(AActor* LaunchedActor);
+		FVector CalculateLaunchVelocity(ACharacter* LaunchedCharacter);
 
 	// When our Trigger Volume overlaps with something, this function gets called
 	UFUNCTION()

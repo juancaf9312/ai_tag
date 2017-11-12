@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-#include "Runtime/Engine/Classes/Engine/TargetPoint.h"
+#include "Engine/TargetPoint.h"
+#include "TagCharacter.h"
 #include "TagController.generated.h"
 
 /**
@@ -27,7 +28,7 @@ private:
 		TArray<AActor*> Waypoints;
 
 	UFUNCTION(BlueprintPure)
-		ATargetPoint* GetRandomWaypoint();
+		ATargetPoint* GetRandomWaypoint() const;
 
 	UFUNCTION(BlueprintCallable)
 		void GoToRandomWaypoint();
@@ -37,4 +38,22 @@ private:
 
 	UFUNCTION()
 		void OnLanded(const FHitResult& Hit);
+
+	UFUNCTION()
+		void RestartMovement();
+
+	UFUNCTION()
+		void MovementBehaviour();
+	
+	UFUNCTION()
+		void TaggedMove(AActor* Goal);
+
+	UFUNCTION()
+		AActor* FindFleeTarget(const TArray<ATagCharacter*> Enemies) const;
+
+	UFUNCTION()
+		AActor* GetClosestEnemy(TArray<ATagCharacter*> VisibleEnemies) const;
+
+	UPROPERTY()
+		ATagCharacter* TagCharacter;
 };

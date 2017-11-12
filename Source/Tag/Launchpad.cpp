@@ -3,10 +3,13 @@
 #include "Launchpad.h"
 #include "TagUtils.h"
 #include "UObject/ConstructorHelpers.h"
-#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
-#include "Runtime/Engine/Classes/GameFramework/Character.h"
-#include "Runtime/Engine/Classes/GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "AI/Navigation/NavigationSystem.h"
+#include "NavArea_Launchpad.h"
+#include "TagCharacter.h"
 
 ALaunchpad::ALaunchpad()
 {
@@ -42,12 +45,12 @@ ALaunchpad::ALaunchpad()
 	TriggerVolume->OnComponentBeginOverlap.AddUniqueDynamic(this, &ALaunchpad::OnTriggerBeginOverlap);
 }
 
-FVector ALaunchpad::CalculateLaunchVelocity(AActor* LaunchedActor)
+FVector ALaunchpad::CalculateLaunchVelocity(ACharacter* LaunchedCharacter)
 {
 	// Launch from the "feet" of the Character
-	auto Start = LaunchedActor->GetActorLocation();
-	Start.Z -= LaunchedActor->GetSimpleCollisionHalfHeight();
-	
+	auto Start = LaunchedCharacter->GetActorLocation();
+	Start.Z -= LaunchedCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+
 	// Launch to the Target in WS
 	auto End = GetActorTransform().TransformPosition(Target);
 
@@ -74,17 +77,11 @@ void ALaunchpad::OnConstruction(const FTransform& Transform)
 
 void ALaunchpad::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* Other, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	auto Character = Cast<ACharacter>(Other);
+	auto TagCharacter = Cast<ATagCharacter>(Other);
 
-	if (Character)
+	if (TagCharacter && OtherComp == TagCharacter->GetRootComponent() && !TagCharacter->Tagged)
 	{
-		LaunchCharacter(Character);
-		
-		// This doesn't appear to be a problem anymore?
-		// Delay a moment so that the AI can reach the Nav Link Center and realise they're on the next path segment
-		// TODO: Force this manually, somehow?
-		//LaunchDelegate.BindUFunction(this, FName("LaunchCharacter"), Character);
-		//GetWorldTimerManager().SetTimer(LaunchDelay, LaunchDelegate, 0.01f, false);
+		LaunchCharacter(TagCharacter);
 	}
 }
 
@@ -99,6 +96,7 @@ void ALaunchpad::UpdateNavLinks()
 	Link.Left = FVector::ZeroVector;
 	Link.Right = Target;
 	Link.Direction = ENavLinkDirection::LeftToRight;
+	Link.SetAreaClass(UNavArea_Launchpad::StaticClass());
 
 	// Force rebuild of local NavMesh
 	auto World = GetWorld();
